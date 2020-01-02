@@ -1,6 +1,6 @@
 {
     "name" : "QS-SharePoster",
-    "appid" : "__UNI__576947A",
+    "appid" : "",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -61,7 +61,7 @@
     /* 快应用特有相关 */
     "mp-weixin" : {
         /* 小程序特有相关 */
-        "appid" : "wxb85d2b3d674a1957",
+        "appid" : "",
         "setting" : {
             "urlCheck" : false
         },
