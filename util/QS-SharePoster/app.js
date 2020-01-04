@@ -36,7 +36,7 @@ let _app = {
 						image = '';
 						break;
 					default:
-						image = '/static/1.jpg';
+						image = '/static/1.png';
 						break;
 				}
 			}

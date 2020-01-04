@@ -1,7 +1,7 @@
 import _app from './app.js';
 import QRCodeAlg from './QRCodeAlg.js';
 const ShreUserPosterBackgroundKey = 'ShrePosterBackground_'; // 背景图片缓存名称前缀
-const idKey = 'QSSHAREPOSTER_IDKEY';	//drawArray自动生成的idkey
+const idKey = 'QSSHAREPOSTER_IDKEY'; //drawArray自动生成的idkey
 var isMp = false;
 // #ifdef MP
 isMp = true;
@@ -109,15 +109,15 @@ function returnPromise(obj) {
 				if (typeof(drawArray) == 'function') {
 					drawArray = drawArray(params);
 				}
-				if(_app.isPromise(drawArray)) {
+				if (_app.isPromise(drawArray)) {
 					drawArray = await drawArray;
 				}
-				
-				if(_app.isArray(drawArray) && drawArray.length > 0) {
+
+				if (_app.isArray(drawArray) && drawArray.length > 0) {
 					let hasAllInfoCallback = false;
 					for (let i = 0; i < drawArray.length; i++) {
 						const drawArrayItem = drawArray[i];
-						if(_app.isFn(drawArrayItem.allInfoCallback) && !hasAllInfoCallback) hasAllInfoCallback = true;
+						if (_app.isFn(drawArrayItem.allInfoCallback) && !hasAllInfoCallback) hasAllInfoCallback = true;
 						drawArrayItem[idKey] = i;
 						let newData;
 						switch (drawArrayItem.type) {
@@ -129,7 +129,9 @@ function returnPromise(obj) {
 								break;
 							case 'qrcode':
 								if (drawArrayItem.image)
-									newData ={ image: await _app.downloadFile_PromiseFc(drawArrayItem.image) };
+									newData = {
+										image: await _app.downloadFile_PromiseFc(drawArrayItem.image)
+									};
 								break;
 							case 'custom':
 								break;
@@ -137,29 +139,36 @@ function returnPromise(obj) {
 								_app.log('未识别的类型');
 								break;
 						}
-						if(newData && _app.isObject(newData)) {
-							drawArray[i] = {...drawArrayItem, ...newData}
+						if (newData && _app.isObject(newData)) {
+							drawArray[i] = { ...drawArrayItem,
+								...newData
+							}
 						};
 					}
-					
-					if(hasAllInfoCallback) {
+
+					if (hasAllInfoCallback) {
 						_app.log('----------------hasAllInfoCallback----------------');
 						const drawArray_copy = [...drawArray];
-						drawArray_copy.sort((a, b)=>{
-							const a_serialNum = !_app.isUndef(a.serialNum)&&!_app.isNull(a.serialNum)?Number(a.serialNum):Number.NEGATIVE_INFINITY;
-							const b_serialNum = !_app.isUndef(b.serialNum)&&!_app.isNull(b.serialNum)?Number(b.serialNum):Number.NEGATIVE_INFINITY;
+						drawArray_copy.sort((a, b) => {
+							const a_serialNum = !_app.isUndef(a.serialNum) && !_app.isNull(a.serialNum) ? Number(a.serialNum) : Number.NEGATIVE_INFINITY;
+							const b_serialNum = !_app.isUndef(b.serialNum) && !_app.isNull(b.serialNum) ? Number(b.serialNum) : Number.NEGATIVE_INFINITY;
 							return a_serialNum - b_serialNum;
 						})
-						
-						for(let i = 0; i < drawArray_copy.length; i++) {
-							const item = {...drawArray_copy[i]};
-							if(_app.isFn(item.allInfoCallback)) {
-								let newData = item.allInfoCallback({drawArray: drawArray_copy});
-								if(_app.isPromise(newData)) newData = await newData;
+
+						for (let i = 0; i < drawArray_copy.length; i++) {
+							const item = { ...drawArray_copy[i]
+							};
+							if (_app.isFn(item.allInfoCallback)) {
+								let newData = item.allInfoCallback({
+									drawArray: drawArray_copy
+								});
+								if (_app.isPromise(newData)) newData = await newData;
 								const item_idKey = item[idKey];
-								if(!_app.isUndef(item_idKey)) {
-									drawArray[item[idKey]]  = {...item, ...newData};
-								}else{
+								if (!_app.isUndef(item_idKey)) {
+									drawArray[item[idKey]] = { ...item,
+										...newData
+									};
+								} else {
 									console.log('程序错误 找不到idKey!!!	...这不应该啊');
 								}
 							}
@@ -221,8 +230,8 @@ function drawShareImage(obj) { //绘制海报方法
 		type,
 		bgScale
 	};
-	delayTimeScale = delayTimeScale!==undefined?delayTimeScale:15;
-	drawDelayTime = drawDelayTime!==undefined?drawDelayTime:100;
+	delayTimeScale = delayTimeScale !== undefined ? delayTimeScale : 15;
+	drawDelayTime = drawDelayTime !== undefined ? drawDelayTime : 100;
 	return new Promise((rs, rj) => {
 		try {
 			_app.showLoading('正在绘制海报');
@@ -258,7 +267,7 @@ function drawShareImage(obj) { //绘制海报方法
 					drawQrCode(Context, qrCodeArray[i]);
 				}
 			}
-			
+
 			_app.showLoading('绘制可控层级序列');
 			if (drawArray && drawArray.length > 0) {
 				for (let i = 0; i < drawArray.length; i++) {
@@ -289,11 +298,11 @@ function drawShareImage(obj) { //绘制海报方法
 				}
 			}
 			_app.showLoading('绘制中')
-			setTimeout(()=>{
-				Context.draw((typeof(reserve) == 'boolean' ? reserve : false), () => {
+			setTimeout(() => {
+				Context.draw((typeof(reserve) == 'boolean' ? reserve : false), function(){
 					_app.showLoading('正在输出图片');
-					let setObj = {};
-					if (setCanvasToTempFilePath && typeof(setCanvasToTempFilePath) == 'function')
+					let setObj = setCanvasToTempFilePath || {};
+					if (setObj && typeof(setObj) == 'function')
 						setObj = setCanvasToTempFilePath(bgObj, type);
 					let canvasToTempFilePathFn;
 					// #ifdef H5
@@ -314,11 +323,12 @@ function drawShareImage(obj) { //绘制海报方法
 						destWidth: bgObj.width * 2, // 若H5使用这里请不要乘以二
 						destHeight: bgObj.height * 2, // 若H5使用这里请不要乘以二
 						quality: .8,
+						fileType: 'jpg',
 						...setObj
 					};
 					_app.log('canvasToTempFilePath的data对象:' + JSON.stringify(data));
 					canvasToTempFilePathFn = function() {
-						uni.canvasToTempFilePath({ //输出为图片
+						const toTempFilePathObj = { //输出为图片
 							...data,
 							canvasId: posterCanvasId,
 							success(res) {
@@ -330,7 +340,8 @@ function drawShareImage(obj) { //绘制海报方法
 								_app.log('输出图片失败:' + JSON.stringify(err));
 								rj('输出图片失败:' + JSON.stringify(err))
 							}
-						}, _this || null)
+						}
+						uni.canvasToTempFilePath(toTempFilePathObj, _this || null);
 					}
 					// #endif
 					let delayTime = 0;
@@ -353,9 +364,9 @@ function drawShareImage(obj) { //绘制海报方法
 					}
 					if (drawArray) {
 						drawArray.forEach(item => {
-							switch (item.type){
+							switch (item.type) {
 								case 'text':
-									if(item.text) {
+									if (item.text) {
 										delayTime += item.text.length;
 									}
 									break;
@@ -463,7 +474,183 @@ function countTextLength(Context, obj) {
 //计算字符长度系数
 function countStrLength(t) {
 	let l;
-	if(/a/.test(t)){l=0.552734375}else if(/b/.test(t)){l=0.638671875}else if(/c/.test(t)){l=0.50146484375}else if(/d/.test(t)){l=0.6396484375}else if(/e/.test(t)){l=0.5673828125}else if(/f/.test(t)){l=0.3466796875}else if(/g/.test(t)){l=0.6396484375}else if(/h/.test(t)){l=0.61572265625}else if(/i/.test(t)){l=0.26611328125}else if(/j/.test(t)){l=0.26708984375}else if(/k/.test(t)){l=0.54443359375}else if(/l/.test(t)){l=0.26611328125}else if(/m/.test(t)){l=0.93701171875}else if(/n/.test(t)){l=0.6162109375}else if(/o/.test(t)){l=0.6357421875}else if(/p/.test(t)){l=0.638671875}else if(/q/.test(t)){l=0.6396484375}else if(/r/.test(t)){l=0.3818359375}else if(/s/.test(t)){l=0.462890625}else if(/t/.test(t)){l=0.37255859375}else if(/u/.test(t)){l=0.6162109375}else if(/v/.test(t)){l=0.52490234375}else if(/w/.test(t)){l=0.78955078125}else if(/x/.test(t)){l=0.5068359375}else if(/y/.test(t)){l=0.529296875}else if(/z/.test(t)){l=0.49169921875}else if(/A/.test(t)){l=0.70361328125}else if(/B/.test(t)){l=0.62744140625}else if(/C/.test(t)){l=0.6689453125}else if(/D/.test(t)){l=0.76171875}else if(/E/.test(t)){l=0.5498046875}else if(/F/.test(t)){l=0.53125}else if(/G/.test(t)){l=0.74365234375}else if(/H/.test(t)){l=0.7734375}else if(/I/.test(t)){l=0.2939453125}else if(/J/.test(t)){l=0.39599609375}else if(/K/.test(t)){l=0.634765625}else if(/L/.test(t)){l=0.51318359375}else if(/M/.test(t)){l=0.97705078125}else if(/N/.test(t)){l=0.81298828125}else if(/O/.test(t)){l=0.81494140625}else if(/P/.test(t)){l=0.61181640625}else if(/Q/.test(t)){l=0.81494140625}else if(/R/.test(t)){l=0.65283203125}else if(/S/.test(t)){l=0.5771484375}else if(/T/.test(t)){l=0.5732421875}else if(/U/.test(t)){l=0.74658203125}else if(/V/.test(t)){l=0.67626953125}else if(/W/.test(t)){l=1.017578125}else if(/X/.test(t)){l=0.64501953125}else if(/Y/.test(t)){l=0.603515625}else if(/Z/.test(t)){l=0.6201171875}else if(/[0-9]/.test(t)){l=0.58642578125}else if(/[\u4e00-\u9fa5]/.test(t)){l=1}else if(/ /.test(t)){l=0.2958984375}else if(/\`/.test(t)){l=0.294921875}else if(/\~/.test(t)){l=0.74169921875}else if(/\!/.test(t)){l=0.3125}else if(/\@/.test(t)){l=1.03125}else if(/\#/.test(t)){l=0.63818359375}else if(/\$/.test(t)){l=0.58642578125}else if(/\%/.test(t)){l=0.8896484375}else if(/\^/.test(t)){l=0.74169921875}else if(/\&/.test(t)){l=0.8701171875}else if(/\*/.test(t)){l=0.455078125}else if(/\(/.test(t)){l=0.333984375}else if(/\)/.test(t)){l=0.333984375}else if(/\_/.test(t)){l=0.4482421875}else if(/\-/.test(t)){l=0.4326171875}else if(/\+/.test(t)){l=0.74169921875}else if(/\=/.test(t)){l=0.74169921875}else if(/\|/.test(t)){l=0.26904296875}else if(/\\/.test(t)){l=0.416015625}else if(/\[/.test(t)){l=0.333984375}else if(/\]/.test(t)){l=0.333984375}else if(/\;/.test(t)){l=0.24072265625}else if(/\'/.test(t)){l=0.25634765625}else if(/\,/.test(t)){l=0.24072265625}else if(/\./.test(t)){l=0.24072265625}else if(/\//.test(t)){l=0.42724609375}else if(/\{/.test(t)){l=0.333984375}else if(/\}/.test(t)){l=0.333984375}else if(/\:/.test(t)){l=0.24072265625}else if(/\"/.test(t)){l=0.435546875}else if(/\</.test(t)){l=0.74169921875}else if(/\>/.test(t)){l=0.74169921875}else if(/\?/.test(t)){l=0.48291015625}else{l=1}
+	if (/a/.test(t)) {
+		l = 0.552734375
+	} else if (/b/.test(t)) {
+		l = 0.638671875
+	} else if (/c/.test(t)) {
+		l = 0.50146484375
+	} else if (/d/.test(t)) {
+		l = 0.6396484375
+	} else if (/e/.test(t)) {
+		l = 0.5673828125
+	} else if (/f/.test(t)) {
+		l = 0.3466796875
+	} else if (/g/.test(t)) {
+		l = 0.6396484375
+	} else if (/h/.test(t)) {
+		l = 0.61572265625
+	} else if (/i/.test(t)) {
+		l = 0.26611328125
+	} else if (/j/.test(t)) {
+		l = 0.26708984375
+	} else if (/k/.test(t)) {
+		l = 0.54443359375
+	} else if (/l/.test(t)) {
+		l = 0.26611328125
+	} else if (/m/.test(t)) {
+		l = 0.93701171875
+	} else if (/n/.test(t)) {
+		l = 0.6162109375
+	} else if (/o/.test(t)) {
+		l = 0.6357421875
+	} else if (/p/.test(t)) {
+		l = 0.638671875
+	} else if (/q/.test(t)) {
+		l = 0.6396484375
+	} else if (/r/.test(t)) {
+		l = 0.3818359375
+	} else if (/s/.test(t)) {
+		l = 0.462890625
+	} else if (/t/.test(t)) {
+		l = 0.37255859375
+	} else if (/u/.test(t)) {
+		l = 0.6162109375
+	} else if (/v/.test(t)) {
+		l = 0.52490234375
+	} else if (/w/.test(t)) {
+		l = 0.78955078125
+	} else if (/x/.test(t)) {
+		l = 0.5068359375
+	} else if (/y/.test(t)) {
+		l = 0.529296875
+	} else if (/z/.test(t)) {
+		l = 0.49169921875
+	} else if (/A/.test(t)) {
+		l = 0.70361328125
+	} else if (/B/.test(t)) {
+		l = 0.62744140625
+	} else if (/C/.test(t)) {
+		l = 0.6689453125
+	} else if (/D/.test(t)) {
+		l = 0.76171875
+	} else if (/E/.test(t)) {
+		l = 0.5498046875
+	} else if (/F/.test(t)) {
+		l = 0.53125
+	} else if (/G/.test(t)) {
+		l = 0.74365234375
+	} else if (/H/.test(t)) {
+		l = 0.7734375
+	} else if (/I/.test(t)) {
+		l = 0.2939453125
+	} else if (/J/.test(t)) {
+		l = 0.39599609375
+	} else if (/K/.test(t)) {
+		l = 0.634765625
+	} else if (/L/.test(t)) {
+		l = 0.51318359375
+	} else if (/M/.test(t)) {
+		l = 0.97705078125
+	} else if (/N/.test(t)) {
+		l = 0.81298828125
+	} else if (/O/.test(t)) {
+		l = 0.81494140625
+	} else if (/P/.test(t)) {
+		l = 0.61181640625
+	} else if (/Q/.test(t)) {
+		l = 0.81494140625
+	} else if (/R/.test(t)) {
+		l = 0.65283203125
+	} else if (/S/.test(t)) {
+		l = 0.5771484375
+	} else if (/T/.test(t)) {
+		l = 0.5732421875
+	} else if (/U/.test(t)) {
+		l = 0.74658203125
+	} else if (/V/.test(t)) {
+		l = 0.67626953125
+	} else if (/W/.test(t)) {
+		l = 1.017578125
+	} else if (/X/.test(t)) {
+		l = 0.64501953125
+	} else if (/Y/.test(t)) {
+		l = 0.603515625
+	} else if (/Z/.test(t)) {
+		l = 0.6201171875
+	} else if (/[0-9]/.test(t)) {
+		l = 0.58642578125
+	} else if (/[\u4e00-\u9fa5]/.test(t)) {
+		l = 1
+	} else if (/ /.test(t)) {
+		l = 0.2958984375
+	} else if (/\`/.test(t)) {
+		l = 0.294921875
+	} else if (/\~/.test(t)) {
+		l = 0.74169921875
+	} else if (/\!/.test(t)) {
+		l = 0.3125
+	} else if (/\@/.test(t)) {
+		l = 1.03125
+	} else if (/\#/.test(t)) {
+		l = 0.63818359375
+	} else if (/\$/.test(t)) {
+		l = 0.58642578125
+	} else if (/\%/.test(t)) {
+		l = 0.8896484375
+	} else if (/\^/.test(t)) {
+		l = 0.74169921875
+	} else if (/\&/.test(t)) {
+		l = 0.8701171875
+	} else if (/\*/.test(t)) {
+		l = 0.455078125
+	} else if (/\(/.test(t)) {
+		l = 0.333984375
+	} else if (/\)/.test(t)) {
+		l = 0.333984375
+	} else if (/\_/.test(t)) {
+		l = 0.4482421875
+	} else if (/\-/.test(t)) {
+		l = 0.4326171875
+	} else if (/\+/.test(t)) {
+		l = 0.74169921875
+	} else if (/\=/.test(t)) {
+		l = 0.74169921875
+	} else if (/\|/.test(t)) {
+		l = 0.26904296875
+	} else if (/\\/.test(t)) {
+		l = 0.416015625
+	} else if (/\[/.test(t)) {
+		l = 0.333984375
+	} else if (/\]/.test(t)) {
+		l = 0.333984375
+	} else if (/\;/.test(t)) {
+		l = 0.24072265625
+	} else if (/\'/.test(t)) {
+		l = 0.25634765625
+	} else if (/\,/.test(t)) {
+		l = 0.24072265625
+	} else if (/\./.test(t)) {
+		l = 0.24072265625
+	} else if (/\//.test(t)) {
+		l = 0.42724609375
+	} else if (/\{/.test(t)) {
+		l = 0.333984375
+	} else if (/\}/.test(t)) {
+		l = 0.333984375
+	} else if (/\:/.test(t)) {
+		l = 0.24072265625
+	} else if (/\"/.test(t)) {
+		l = 0.435546875
+	} else if (/\</.test(t)) {
+		l = 0.74169921875
+	} else if (/\>/.test(t)) {
+		l = 0.74169921875
+	} else if (/\?/.test(t)) {
+		l = 0.48291015625
+	} else {
+		l = 1
+	}
 	return l;
 }
 
@@ -726,7 +913,7 @@ function drawImageFn(Context, img) {
 	_app.log('进入绘制默认图片方法, img:' + JSON.stringify(img));
 	if (img.url) {
 		const hasAlpha = !_app.isUndef(img.alpha);
-		img.alpha = Number(!_app.isUndef(img.alpha)?img.alpha:1);
+		img.alpha = Number(!_app.isUndef(img.alpha) ? img.alpha : 1);
 		Context.setGlobalAlpha(img.alpha);
 		_app.log('绘制默认图片方法, 有url');
 		if (img.dWidth && img.dHeight && img.sx && img.sy && img.sWidth && img.sHeight) {
@@ -743,7 +930,7 @@ function drawImageFn(Context, img) {
 			_app.log('绘制默认图片方法, 绘制第三种方案');
 			Context.drawImage(img.url, img.dx || 0, img.dy || 0);
 		}
-		if(hasAlpha) {
+		if (hasAlpha) {
 			Context.setGlobalAlpha(1);
 		}
 	}
@@ -830,19 +1017,20 @@ function drawRoundRectImage(Context, obj) { // 绘制矩形
 
 // export 
 function drawQrCode(Context, qrCodeObj) { //生成二维码方法， 参考了 诗小柒 的二维码生成器代码
+	_app.log('进入绘制二维码方法')
 	_app.showLoading('正在生成二维码');
 	let qrcodeAlgObjCache = [];
 	let options = {
-		text: String(qrCodeObj.text||'') || '', // 生成内容
-		size: Number(qrCodeObj.size||0) || 200, // 二维码大小
-		background: String(qrCodeObj.background||'') || '#ffffff', // 背景色
-		foreground: String(qrCodeObj.foreground||'') || '#000000', // 前景色
-		pdground: String(qrCodeObj.pdground||'') || '#000000', // 定位角点颜色
-		correctLevel: Number(qrCodeObj.correctLevel||0) || 3, // 容错级别
-		image: String(qrCodeObj.image||'') || '', // 二维码图标
-		imageSize: Number(qrCodeObj.imageSize||0) || 40, // 二维码图标大小
-		dx: Number(qrCodeObj.dx||0) || 0, // x轴距离
-		dy: Number(qrCodeObj.dy||0) || 0 // y轴距离
+		text: String(qrCodeObj.text || '') || '', // 生成内容
+		size: Number(qrCodeObj.size || 0) || 200, // 二维码大小
+		background: String(qrCodeObj.background || '') || '#ffffff', // 背景色
+		foreground: String(qrCodeObj.foreground || '') || '#000000', // 前景色
+		pdground: String(qrCodeObj.pdground || '') || '#000000', // 定位角点颜色
+		correctLevel: Number(qrCodeObj.correctLevel || 0) || 3, // 容错级别
+		image: String(qrCodeObj.image || '') || '', // 二维码图标
+		imageSize: Number(qrCodeObj.imageSize || 0) || 40, // 二维码图标大小
+		dx: Number(qrCodeObj.dx || 0) || 0, // x轴距离
+		dy: Number(qrCodeObj.dy || 0) || 0 // y轴距离
 	}
 	let qrCodeAlg = null;
 	let d = 0;

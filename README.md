@@ -30,7 +30,7 @@ H5不支持本地存储机制
 
 | 版本号| 更新说明|
 | --------- | -------- |
-| v3.0.1| 1.drawArray类型项内属性新增`allInfoCallback`属性，可以获取drawArray绘制序列全部的详细信息, 并相应新增serialNum属性用于控制顺序, 详见[2.0.8 drawArray参数详解](#drawArray) <br /> 2.新增属性formData，用于app.js中的获取背景图方法的携带数据 <br />3.image类型新增alpha参数用于控制透明度[0, 1]|
+| v3.0.1| 1.drawArray类型项内属性新增`allInfoCallback`属性，可以获取drawArray绘制序列全部的详细信息, 并相应新增serialNum属性用于控制顺序, 详见[2.0.8 drawArray参数详解](#drawArray), 示例在示例项目中绘制的第二段文字 <br /> 2.新增属性formData，用于app.js中的获取背景图方法的携带数据 <br />3.image类型新增alpha参数用于控制透明度[0, 1]|
 | v3.0.0| 1.版本号更改为3.0.0开始<br />2.新增`可控层级绘制序列-drawArray`, 建议使用该序列绘制, 该属性可直接return数组，也可以return一个promise对象, 但最终resolve一个数组, 这样就可以方便实现后台可控绘制海报 详见2. <br />3.新增 delayTimeScale(生成图片时延时系数)、 drawDelayTime(draw方法延时时间)等属性，控制延时, 详见2. <br />4.`注意`, 引入js写法改成 `import { getSharePoster } from '@/util/QS-SharePoster/QS-SharePoster.js';`<br />5.新增_this属性，组件中使用时必传,详见2.<br />6.修复有时绘制圆形或矩形圆角图片不生效问题|
 | ...| [`查看历次更新`](#oldUpdate) |
 
@@ -58,8 +58,10 @@ H5不支持本地存储机制
 
 使用步骤
 1、在需使用的vue页面中`创建一个canvas`，并自定义id，该id需传入js方法中，并`动态绑定宽高`
-2、引入QS-SharePoster.js，该js文件`导出一个方法`
-3、使用引入的方法。 该方法`接收一个对象`，并返回一个`Promise对象`，在页面中可以使用async、await的方式，也可以用then方法, `该方法最终返回绘制好的海报临时路径`
+2、引入QS-SharePoster.js，该js文件导出一个对象,使用该对象中的getSharePoster方法
+3、使用getSharePoster方法。 该方法`接收一个对象`，并返回一个`Promise对象`，在页面中可以使用async、await的方式，也可以用then方法, `该方法最终返回绘制好的海报临时路径`
+
+注意: 若没有自行控制画布宽高，则应该设置setCanvasWH方法并设置画布宽高
 
 本地存储机制: 背景图从后端获取后会以‘/’字符分割后的最后一位为name，QS-SharePoster会判断此name是不是和本地相同，若不同则从后端获取重新生成，若相同则使用本地路径，name判断通过后，还会判断图片宽高信息，不通过则重新获取，所以， 若后端需换背景图，则将新上传的图片命名不要相同与前一次, 或宽高不同于前一次即可
 
@@ -101,7 +103,7 @@ H5不支持本地存储机制
 | 属性名 | 是否必填 | 值类型 | 默认值 | 说明 |
 | --------- | -------- | -----: | --: | --: |
 | `v3.0.1更新` | |  | |   |
-| allInfoCallback | | Function|  | 接收一个对象， 该对象目前包含一个drawArray属性, 可以获取全部的drawArray的详细参数, 该方法可以return一个对象或promise对象，最终输出一个对象, 该对象的属性将会覆盖原属性|
+| allInfoCallback | | Function|  | 该参数传入一个方法，该方法接收一个对象，该对象目前包含一个drawArray属性, 可以获取全部的drawArray的详细参数, 该方法可以return一个对象或promise对象，最终输出一个对象, 该对象的属性将会覆盖原属性|
 | serialNum| | Number|  -∞| 用于控制序列中allInfoCallback的顺序, 数值越小, 越先获取|
 | `over` | |  | |   |
 | type| 是| String|  | 绘制类型, 可选值 'text'、'image'、'qrcode'、'custom'|
