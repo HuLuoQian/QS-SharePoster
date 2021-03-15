@@ -23,7 +23,8 @@
 		</QSPopup>
 		<!-- 画布 -->
 		<view class="hideCanvasView">
-			<canvas class="hideCanvas" canvas-id="default_PosterCanvasId" :style="{width: (poster.width||10) + 'px', height: (poster.height||10) + 'px'}"></canvas>
+			<canvas class="hideCanvas" id="default_PosterCanvasId" canvas-id="default_PosterCanvasId"
+				:style="{width: (poster.width||10) + 'px', height: (poster.height||10) + 'px'}"></canvas>
 		</view>
 	</view>
 </template>
@@ -48,17 +49,9 @@
 					const d = await getSharePoster({
 						_this: this, //若在组件中使用 必传
 						type: 'testShareType',
-						formData: {
-							//访问接口获取背景图携带自定义数据
-
-						},
-						posterCanvasId: this.canvasId,	//canvasId
+						posterCanvasId: this.canvasId, //canvasId
 						delayTimeScale: 20, //延时系数
-						// background: {
-						// 	width: 1080,
-						// 	height: 1920,
-						// 	backgroundColor: '#666'
-						// },
+						canvas2image: false, //是否调用uni.canvasToTempFilePath 生成图片, 若不为false则判定为true
 						drawArray: ({
 							bgObj,
 							type,
@@ -74,7 +67,9 @@
 										setDraw(Context) {
 											Context.setFillStyle('black');
 											Context.setGlobalAlpha(0.3);
-											Context.fillRect(0, bgObj.height - bgObj.height * 0.2, bgObj.width, bgObj.height * 0.2);
+											Context.fillRect(0, bgObj.height - bgObj
+												.height * 0.2, bgObj.width, bgObj
+												.height * 0.2);
 											Context.setGlobalAlpha(1);
 										}
 									},
@@ -85,19 +80,57 @@
 										dx,
 										dy: bgObj.height - bgObj.width * 0.25,
 										infoCallBack(imageInfo) {
-											let scale = bgObj.width * 0.2 / imageInfo.height;
+											let scale = bgObj.width * 0.2 / imageInfo
+												.height;
 											return {
 												circleSet: {
 													x: imageInfo.width * scale / 2,
 													y: bgObj.width * 0.2 / 2,
 													r: bgObj.width * 0.2 / 2
 												}, // 圆形图片 , 若circleSet与roundRectSet一同设置 优先circleSet设置
-												dWidth: imageInfo.width * scale, // 因为设置了圆形图片 所以要乘以2
+												dWidth: imageInfo.width *
+												scale, // 因为设置了圆形图片 所以要乘以2
 												dHeight: bgObj.width * 0.2,
 												/* roundRectSet: { // 圆角矩形
 													r: imageInfo.width * .1
 												} */
 											}
+										}
+									},
+									{
+										type: 'text',
+										fontStyle: 'italic',
+										text: '一二三四五六七八九十十一十二十三十四十五十六十七十八十九二十二十一二十二',
+										size: fontSize,
+										color: 'white',
+										serialNum: 0,
+										id: 'lineFeed',
+										dx: bgObj.width * .1,
+										dy: bgObj.height * .1,
+										lineFeed: {
+											maxWidth: bgObj.width * .3,
+										}
+									},
+									{
+										type: 'text',
+										fontStyle: 'italic',
+										text: '我可以获取上面换行的数据, 跟在他后面',
+										size: fontSize,
+										color: 'white',
+										serialNum: 1,
+										dx: bgObj.width * .1,
+										lineFeed: {
+											maxWidth: bgObj.width * .3,
+										},
+										allInfoCallback({
+											drawArray
+										} = {}) {
+											const lineFeeds = drawArray.filter(ite => ite.id == 'lineFeed');
+											const last = lineFeeds[lineFeeds.length - 1];
+											const r = {
+												dy: last.dy + fontSize + 15
+											}
+											return r;
 										}
 									},
 									{
@@ -110,14 +143,16 @@
 										textAlign: 'left',
 										textBaseline: 'middle',
 										infoCallBack(textLength) {
-											_app.log('index页面的text的infocallback ，textlength:' + textLength);
+											_app.log(
+												'index页面的text的infocallback ，textlength:' +
+												textLength);
 											return {
 												dx: bgObj.width - textLength - fontSize,
 												dy: bgObj.height - lineHeight * 3
 											}
 										},
 										serialNum: 0,
-										id: 'tag1'	//自定义标识
+										id: 'tag1' //自定义标识
 									},
 									{
 										type: 'text',
@@ -129,10 +164,11 @@
 										textAlign: 'left',
 										textBaseline: 'middle',
 										serialNum: 1,
-										allInfoCallback({	//v3.0.1 更新 可以获取drawArray中全部数据
+										allInfoCallback({ //v3.0.1 更新 可以获取drawArray中全部数据
 											drawArray
 										} = {}) {
 											const obj = drawArray.find(item => item.id === 'tag1');
+											const lineFeed = drawArray.filter(item => item.id === 'lineFeed');
 											/* return {
 												dx: obj.dx,
 												dy: obj.dy + lineHeight
@@ -142,7 +178,9 @@
 												setTimeout(() => {
 													rs({
 														dx: obj.dx,
-														dy: obj.dy + lineHeight
+														dy: obj
+															.dy +
+															lineHeight
 													});
 												}, 1);
 											});
@@ -167,8 +205,8 @@
 										type: 'qrcode',
 										text: '你好，我是取舍',
 										size: bgObj.width * 0.2,
-										dx: bgObj.width*0.05,
-										dy: bgObj.height - bgObj.width*0.25
+										dx: bgObj.width * 0.05,
+										dy: bgObj.height - bgObj.width * 0.25
 									}
 								]);
 							})
@@ -181,9 +219,17 @@
 							this.poster = bgObj;
 						}
 					});
-					_app.log('海报生成成功, 时间:' + new Date() + '， 临时路径: ' + d.poster.tempFilePath)
-					this.posterImage = d.poster.tempFilePath;
-					this.$refs.popup.show()
+					uni.canvasToTempFilePath({
+						canvasId: this.canvasId,
+						success: res => {
+							this.posterImage = res.tempFilePath;
+							_app.log('海报生成成功, 时间:' + new Date() + '， 临时路径: ' + res.tempFilePath);
+							this.$refs.popup.show()
+						},
+						fail: err => {
+							console.log('生成异常', err)
+						}
+					})
 				} catch (e) {
 					_app.hideLoading();
 					_app.showToast(JSON.stringify(e));

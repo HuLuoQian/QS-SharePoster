@@ -23,7 +23,7 @@
 		</QSPopup>
 		<!-- 画布 -->
 		<view class="hideCanvasView">
-			<canvas class="hideCanvas" canvas-id="default_PosterCanvasId" :style="{width: (poster.width||10) + 'px', height: (poster.height||10) + 'px'}"></canvas>
+			<canvas class="hideCanvas" id="default_PosterCanvasId" canvas-id="default_PosterCanvasId" :style="{width: (poster.width||10) + 'px', height: (poster.height||10) + 'px'}"></canvas>
 		</view>
 	</view>
 </template>
