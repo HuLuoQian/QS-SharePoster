@@ -1,0 +1,18 @@
+<view class="content"><text style="font-size:29rpx;color:#999;">QS-SharePoster.js中导出了一个方法--getSharePoster \n
+		getSharePoster 为一个function，传入一个Object为配置参数对象, 最终return一个Promise对象 \n
+		配置参数对象参数如下: { \n
+			posterCanvasId: 'String 页面中canvas组件的canvasid属性', \n
+			type: 'Any 自定义标识, 用于逻辑判断', \n
+			bgScale: 'Number 自定义缩放系数, 默认0', \n
+			formData: 'Any 若背景图为app.js获取， 则该参数将传至app.js中的获取背景图方法中用于访问接口携带参数', \n
+			backgroundImage: 'String 背景图地址, 优先级大于app.js获取背景图', \n
+			background: 'Object: { height: '画布高度', width: '画布宽度', backgroundColor: '背景颜色' } 自定义背景, 优先级大于backgroundImage', \n
+			reserve: 'Boolean 是否接着上次继续绘制', \n
+			drawArray: 'Function|Array有序绘制序列', \n
+			setCanvasWH: 'Function 用于设置当前页面所绑定画布的宽高, 一般必填', \n
+			setCanvasToTempFilePath: 'Function | Object uni.canvasToTempFilePath 配置参数', \n
+			Context: 'canvasContext 画布实例', \n
+			_this: 'Vue Vue实例', \n
+			delayTimeScale: 'Number 延时系数', \n
+			drawDelayTime: 'Number draw方法延时时间值' \n
+		} \n</text><button type="primary" data-event-opts="{{[['tap',[['shareFc']]]]}}" bindtap="__e">生成海报</button><q-s-popup class="vue-ref" vue-id="4a828340-1" data-ref="popup" bind:__l="__l" vue-slots="{{['default']}}"><view class="flex_column"><view class="backgroundColor-white padding1vh border_radius_10px"><image class="posterImage" src="{{posterImage||''}}" mode="widthFix"></image></view><view class="flex_row marginTop2vh"><button type="primary" size="mini" data-event-opts="{{[['tap',[['saveImage']]]]}}" catchtap="__e">保存图片</button><button type="primary" size="mini" data-event-opts="{{[['tap',[['share']]]]}}" catchtap="__e">分享图片</button></view></view></q-s-popup><view class="hideCanvasView"><canvas class="hideCanvas" style="{{'width:'+((poster.width||10)+'px')+';'+('height:'+((poster.height||10)+'px')+';')}}" id="default_PosterCanvasId" canvas-id="default_PosterCanvasId"></canvas></view></view>

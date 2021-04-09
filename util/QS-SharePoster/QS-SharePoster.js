@@ -653,11 +653,19 @@ function setLineFeed(Context, textItem, bgObj) {
 				lineHeight;
 			dx = (lineFeed.dx !== undefined && typeof(lineFeed.dx) === 'number') ? lineFeed.dx : dx;
 		}
+		_app.lineFeedTags.forEach(i=>{
+			textItem.text = textItem.text.split(i).join(_app.tagetLineFeedTag);
+		})
 		const chr = (textItem.text).split("");
 		let temp = "";
 		const row = [];
 		//循环出几行文字组成数组
 		for (let a = 0, len = chr.length; a < len; a++) {
+			if(chr[a] === _app.tagetLineFeedTag) {
+				row.push(temp);
+				temp = chr[++a];
+				continue;
+			}
 			if (countTextLength(Context, {
 					text: temp,
 					size: textItem.size
@@ -682,7 +690,12 @@ function setLineFeed(Context, textItem, bgObj) {
 		for (let i = 0; i < allNum; i++) {
 			let str = row[i];
 			if (i == (allNum - 1) && allNum < row.length && row.length > 1) {
-				str = str.substring(0, str.length - 1) + '...';
+				if(countTextLength(Context, {
+					text: str,
+					size: textItem.size
+				}) > (maxWidth - textItem.size)*.9) {
+					str = str.substring(0, str.length - 1) + '...';
+				}
 			}
 			const obj = {
 				...textItem,

@@ -1,0 +1,20 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/common/common",
+    "pages/infoCallBack/infoCallBack",
+    "pages/allInfoCallback/allInfoCallback",
+    "pages/setBgObjAndGetBgObj/setBgObjAndGetBgObj"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "usingComponents": {
+    "q-s-popup": "/components/QS-popup/QS-popup"
+  },
+  "sitemapLocation": "sitemap.json"
+}

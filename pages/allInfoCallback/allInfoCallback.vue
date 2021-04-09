@@ -34,6 +34,7 @@
 	import {
 		getSharePoster
 	} from '@/util/QS-SharePoster/QS-SharePoster.js';
+	var ctx;
 	export default {
 		data() {
 			return {
@@ -42,6 +43,9 @@
 				canvasId: 'default_PosterCanvasId'
 			}
 		},
+		mounted() {
+			ctx = uni.createCanvasContext(this.canvasId, this);
+		},
 		methods: {
 			async shareFc() {
 				try {
@@ -49,9 +53,10 @@
 					const d = await getSharePoster({
 						_this: this, //若在组件中使用 必传
 						type: 'testShareType',
+						Context: ctx,
 						posterCanvasId: this.canvasId, //canvasId
 						delayTimeScale: 20, //延时系数
-						canvas2image: false, //是否调用uni.canvasToTempFilePath 生成图片, 若不为false则判定为true
+						draw: false, //是否执行ctx.draw方法, 推荐false，自己去draw
 						drawArray: ({
 							bgObj,
 							type,
@@ -100,7 +105,7 @@
 									{
 										type: 'text',
 										fontStyle: 'italic',
-										text: '一二三四五六七八九十十一十二十三十四十五十六十七十八十九二十二十一二十二',
+										text: '一二\n三四五六七八九十十一十二<br />十三十四十五十六十七十八十九二十二十一二十二',
 										size: fontSize,
 										color: 'white',
 										serialNum: 0,
@@ -109,7 +114,7 @@
 										dy: bgObj.height * .1,
 										lineFeed: {
 											maxWidth: bgObj.width * .3,
-											lineNum: 1
+											lineNum: 2
 										}
 									},
 									{
@@ -220,16 +225,18 @@
 							this.poster = bgObj;
 						}
 					});
-					uni.canvasToTempFilePath({
-						canvasId: this.canvasId,
-						success: res => {
-							this.posterImage = res.tempFilePath;
-							_app.log('海报生成成功, 时间:' + new Date() + '， 临时路径: ' + res.tempFilePath);
-							this.$refs.popup.show()
-						},
-						fail: err => {
-							console.log('生成异常', err)
-						}
+					ctx.draw(false, ()=>{
+						uni.canvasToTempFilePath({
+							canvasId: this.canvasId,
+							success: res => {
+								this.posterImage = res.tempFilePath;
+								_app.log('海报生成成功, 时间:' + new Date() + '， 临时路径: ' + res.tempFilePath);
+								this.$refs.popup.show()
+							},
+							fail: err => {
+								console.log('生成异常', err)
+							}
+						})
 					})
 				} catch (e) {
 					_app.hideLoading();

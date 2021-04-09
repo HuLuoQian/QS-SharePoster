@@ -1,6 +1,8 @@
 let log = console.log; // 如果在项目的APP.vue文件中的onlaunch中设置 console.log = ()=> {} 则在此也不会有打印信息
 // log = ()=>{};	// 打开注释则该插件不会打印任何信息
 let _app = {
+	lineFeedTags: ['<br />', '<br/>', '\r\n', '\n\t', '\r', '\n'],	//换行符识别列表
+	tagetLineFeedTag: `❤`,	//将lineFeedTags列表中的字符串替换为该字符, 代表换行符, 只要找一个特殊符号就行，必须是单字符单字符单字符!
 	//交互控制
 	log(t) {
 		// log(t);
