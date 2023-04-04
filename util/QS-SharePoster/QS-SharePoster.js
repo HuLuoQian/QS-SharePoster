@@ -1223,12 +1223,12 @@ const drawImageModes = {
 		let drawWidth = dWidth;
 		let drawHeight = height / width * drawWidth;
 		if (drawHeight < dHeight) {
-			const diffHeight = (Number(dHeight) - Number(drawHeight)) / Number(dHeight) * height;
+			const diffHeight = (Number(dHeight) - Number(drawHeight));
 			img.dy = Number(img.dy) + diffHeight / 2;
 		} else {
 			drawHeight = dHeight;
 			drawWidth = width / height * drawHeight;
-			const diffWidth = (Number(dWidth) - Number(drawWidth)) / Number(dWidth) * width;
+			const diffWidth = (Number(dWidth) - Number(drawWidth));
 			img.dx = Number(img.dx) + diffWidth / 2;
 		}
 		Context.drawImage(img.url, 0, 0, width, height, img.dx, img.dy, drawWidth, drawHeight);
